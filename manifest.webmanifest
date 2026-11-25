@@ -1,0 +1,21 @@
+{
+  "id": "/TheAvengersAtlas/",
+  "name": "The Avengers Atlas",
+  "short_name": "Avengers Atlas",
+  "description": "Bộ sưu tập atlas 3D về các thành viên Avengers. Xoay mô hình, bấm từng bộ phận và đọc cách nó hoạt động.",
+  "lang": "vi",
+  "dir": "ltr",
+  "start_url": "/TheAvengersAtlas/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#04060c",
+  "theme_color": "#04060c",
+  "categories": ["education", "entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
+  ]
+}

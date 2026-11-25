@@ -2,7 +2,24 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Avengers Atlas">
+<meta name="application-name" content="Avengers Atlas">
+<link rel="apple-touch-startup-image" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1290x2796.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1179x2556.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1284x2778.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1170x2532.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1125x2436.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-828x1792.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="splash/splash-750x1334.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1320x2868.jpg">
+<link rel="apple-touch-startup-image" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="splash/splash-1206x2622.jpg">
 <meta name="theme-color" content="#04060c">
 <meta name="author" content="Tai Dinh">
 <title>The Avengers Atlas</title>
@@ -172,6 +189,34 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0}
   .d-title{font-size:42px} .d-syn{font-size:16px}
   .detail .close{left:16px;top:21px}
   .detail .dlogo{height:64px}
+}
+
+/* ===== installed-app (PWA) safe areas + install hint ===== */
+.top{padding-left:max(32px,env(safe-area-inset-left));padding-right:max(32px,env(safe-area-inset-right))}
+.foot{left:max(32px,env(safe-area-inset-left));right:max(32px,env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom))}
+.arr.prev{left:calc(20px + env(safe-area-inset-left))} .arr.next{right:calc(20px + env(safe-area-inset-right))}
+.detail{padding-bottom:calc(56px + env(safe-area-inset-bottom))}
+.install{position:fixed;left:50%;bottom:calc(64px + env(safe-area-inset-bottom));z-index:45;width:min(92vw,420px);
+  display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border:1px solid rgba(242,244,248,.28);
+  background:rgba(8,12,24,.82);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--ink);
+  transform:translate(-50%,calc(100% + 120px));transition:transform .7s var(--ease)}
+.install.show{transform:translate(-50%,0)}
+.install img{width:40px;height:40px;border-radius:9px;flex:none}
+.install .tx{flex:1;font-size:12.5px;line-height:1.4;font-family:var(--sans);font-weight:500}
+.install .tx b{display:block;font-weight:600;font-size:13px;margin-bottom:2px}
+.install .tx svg{width:14px;height:14px;vertical-align:-2px;fill:none;stroke:var(--glow);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.install .go{height:32px;padding:0 12px;border:1px solid var(--glow);color:var(--glow);flex:none;display:none}
+.install.can .go{display:inline-flex;align-items:center}
+.install .x{width:32px;height:32px;display:grid;place-items:center;flex:none;color:var(--muted);font-size:18px;line-height:1}
+@media (max-width:767px){
+  .top{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .foot{left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
+  .arr.prev{left:calc(6px + env(safe-area-inset-left))} .arr.next{right:calc(6px + env(safe-area-inset-right))}
+  .detail{padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+  .install{bottom:calc(52px + env(safe-area-inset-bottom))}
+  .d-right{height:46svh}
+  .poster{width:calc(46svh * 474 / 900);height:46svh}
+  .foot > span:last-child{display:none}
 }
 </style>
 </head>
@@ -544,6 +589,44 @@ function frame(now){
 measure(); setActive(((Math.round(s)%N)+N)%N,1);
 requestAnimationFrame(frame);
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(measure);
+})();
+</script>
+<div class="install" id="install" role="dialog" aria-label="Cài The Avengers Atlas">
+  <img src="icons/apple-touch-icon.png" alt="">
+  <div class="tx" id="installTx"></div>
+  <button class="go lbl" id="installGo">Cài app</button>
+  <button class="x" id="installX" aria-label="Đóng">×</button>
+</div>
+<script>
+(function(){
+  var standalone = (window.navigator.standalone === true) || matchMedia('(display-mode: standalone)').matches;
+  if (standalone) document.documentElement.classList.add('app');
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+  if (standalone) return;
+  var KEY = 'aa-install-hint';
+  try { if (localStorage.getItem(KEY)) return; } catch(e) {}
+  var ua = navigator.userAgent;
+  var isIOS = /iP(hone|od|ad)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var inApp = /FBAN|FBAV|FB_IAB|Instagram|Zalo|Line\/|Messenger|TikTok/i.test(ua);
+  var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua);
+  var box = document.getElementById('install'), tx = document.getElementById('installTx');
+  var share = '<svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+  function show(html){ tx.innerHTML = html; setTimeout(function(){ box.classList.add('show'); }, 1800); }
+  function hide(){ box.classList.remove('show'); try { localStorage.setItem(KEY, '1'); } catch(e) {} }
+  document.getElementById('installX').onclick = hide;
+  var deferred = null;
+  addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferred = e; box.classList.add('can');
+    show('<b>Cài The Avengers Atlas</b>Mở như một app, toàn màn hình.');
+  });
+  document.getElementById('installGo').onclick = function(){
+    if (!deferred) return; deferred.prompt(); deferred.userChoice.finally(function(){ deferred = null; hide(); });
+  };
+  if (isIOS && inApp) show('<b>Cài lên iPhone</b>Mở trang này bằng Safari, rồi bấm ' + share + ' → <i>Thêm vào MH chính</i>.');
+  else if (isIOS && isSafari) show('<b>Cài lên iPhone</b>Bấm ' + share + ' Chia sẻ → <i>Thêm vào MH chính</i>.');
+  else if (isIOS) show('<b>Cài lên iPhone</b>Bấm ' + share + ' Chia sẻ → <i>Thêm vào MH chính</i> (iOS 16.4+), hoặc mở bằng Safari.');
 })();
 </script>
 </body>
