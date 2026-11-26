@@ -2,7 +2,7 @@
    - Pages: network first, cached copy when offline (so updates show up right away).
    - Images, icons, fonts: served from cache, refreshed in the background.
    - Video (bg.mp4) is left to the browser: iOS needs byte-range requests for video. */
-const VERSION = 'aa-v2';
+const VERSION = 'aa-v3';
 const SHELL = [
   './',
   './index.html',
