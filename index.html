@@ -135,6 +135,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0}
 .arr{position:fixed;top:calc(50% + var(--H) / 2 + 40px);width:44px;height:44px;display:grid;place-items:center;z-index:22;color:var(--ink)}
 .arr svg{width:18px;height:10px;fill:none;stroke:currentColor;stroke-width:1.2}
 .arr.prev{left:20px} .arr.next{right:20px}
+.arr{transition:transform .4s var(--ease)} .arr.end{transform:scale(0);pointer-events:none}
 
 /* ===== footer ===== */
 .foot{position:fixed;left:32px;right:32px;bottom:26px;display:flex;justify-content:space-between;z-index:20;color:rgba(242,244,248,.8)}
@@ -333,7 +334,7 @@ const F_ALL = [
 ];
 /* only characters that already have an atlas page are shown on the shelf */
 const F = F_ALL.filter(f=>f.url);
-const N=F.length, COPIES=Math.max(3,Math.ceil(30/N)), NV=N*COPIES;
+const N=F.length, COPIES=1, NV=N;  /* no loop: each atlas appears once */
 const PH_FIRST={all:0}; F.forEach((f,i)=>{ if(!(f.ph in PH_FIRST)) PH_FIRST[f.ph]=i; });
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $=s=>document.querySelector(s);
@@ -381,11 +382,13 @@ function measure(){
 addEventListener('resize',measure);
 
 /* ================= STATE ================= */
-let s=N+0, T=s, hoverV=-1, active=-1, mx=-200, my=-200, cx=mx, cy=my, tiltX=0, tiltY=0, onCover=false, isOpen=false, dragging=false;
+let s=0, T=s, hoverV=-1, active=-1, mx=-200, my=-200, cx=mx, cy=my, tiltX=0, tiltY=0, onCover=false, isOpen=false, dragging=false;
 const smooth=x=>x*x*(3-2*x);
 function B(r){ return Math.abs(r)<1 ? (r+Math.sin(Math.PI*r)/Math.PI)/2 : Math.sign(r)*.5; }
 function Fx(r){ return r*(ws+gap)+(d-ws+1.6*gap)*B(r); }
-function rel(v){ let r=((v-s)%NV+NV)%NV; if(r>=NV/2) r-=NV; return r; }
+function rel(v){ return v-s; }
+const clampT=x=>Math.max(0,Math.min(N-1,x));
+const snapT=()=>{ T=clampT(Math.round(T)); };
 
 /* ================= CAPTION ================= */
 const cT=$('#cTitle'), cS=$('#cSub'), cY=$('#cYear');
@@ -420,28 +423,26 @@ function moveInd(){
 }
 tabs.addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b||isOpen) return;
-  const target=PH_FIRST[b.dataset.ph]; const cur=((Math.round(T)%N)+N)%N;
-  let delta=target-cur; if(delta>N/2) delta-=N; if(delta<-N/2) delta+=N;
-  T=Math.round(T)+delta;
+  T=PH_FIRST[b.dataset.ph];
 });
 
 /* ================= INPUT ================= */
-$('#prev').onclick=()=>{ if(!isOpen) T=Math.round(T)-1; };
-$('#next').onclick=()=>{ if(!isOpen) T=Math.round(T)+1; };
-$('#logo').onclick=e=>{e.preventDefault(); if(!isOpen) T=Math.round(T)-(((Math.round(T)%N)+N)%N);};
+$('#prev').onclick=()=>{ if(!isOpen) T=clampT(Math.round(T)-1); };
+$('#next').onclick=()=>{ if(!isOpen) T=clampT(Math.round(T)+1); };
+$('#logo').onclick=e=>{e.preventDefault(); if(!isOpen) T=0;};
 addEventListener('keydown',e=>{
   if(e.key==='Escape' && isOpen){ closeDetail(); return; }
   if(isOpen) return;
-  if(e.key==='ArrowLeft'){ T=Math.round(T)-1; e.preventDefault(); }
-  else if(e.key==='ArrowRight'){ T=Math.round(T)+1; e.preventDefault(); }
+  if(e.key==='ArrowLeft'){ T=clampT(Math.round(T)-1); e.preventDefault(); }
+  else if(e.key==='ArrowRight'){ T=clampT(Math.round(T)+1); e.preventDefault(); }
   else if(e.key==='Enter' && (document.activeElement===document.body||!document.activeElement)){ openDetail(); }
 });
 let wheelT=0;
 addEventListener('wheel',e=>{
   if(isOpen) return;
   const dlt=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
-  T+=dlt/(ws+gap)*.5;
-  clearTimeout(wheelT); wheelT=setTimeout(()=>{T=Math.round(T);},160);
+  T=Math.max(-.35,Math.min(N-1+.35,T+dlt/(ws+gap)*.5));
+  clearTimeout(wheelT); wheelT=setTimeout(snapT,160);
 },{passive:true});
 
 const shelf=$('#shelf'); let down=null, suppress=false;
@@ -452,17 +453,17 @@ addEventListener('pointermove',e=>{
   if(down && e.pointerId===down.id){
     const dx=e.clientX-down.x;
     if(!dragging && Math.abs(dx)>5){ dragging=true; try{shelf.setPointerCapture(e.pointerId);}catch(_){} }
-    if(dragging){ T=down.T0-dx/(ws+gap); }
+    if(dragging){ const raw=down.T0-dx/(ws+gap); T=raw<0?raw*.3:raw>N-1?N-1+(raw-N+1)*.3:raw; }
   }
 });
-function endDrag(){ if(dragging){ T=Math.round(T); suppress=true; setTimeout(()=>suppress=false,0); } dragging=false; down=null; }
+function endDrag(){ if(dragging){ snapT(); suppress=true; setTimeout(()=>suppress=false,0); } dragging=false; down=null; }
 addEventListener('pointerup',endDrag); addEventListener('pointercancel',endDrag);
 
 stage.addEventListener('click',e=>{
   if(suppress||isOpen) return;
   const el=e.target.closest('.tape'); if(!el) return;
   const r=rel(+el.dataset.v);
-  if(Math.abs(r)<.5) openDetail(); else T=Math.round(T+r);
+  if(Math.abs(r)<.5) openDetail(); else T=clampT(Math.round(T+r));
 });
 tapes.forEach(t=>{
   t.el.addEventListener('pointerenter',()=>{hoverV=t.v;});
@@ -522,7 +523,7 @@ function coverInset(){
 const lineMasks=()=>[...detail.querySelectorAll('.d-left .mask > span')];
 function openDetail(){
   if(isOpen) return;
-  T=Math.round(T); s=T; isOpen=true;
+  snapT(); s=T; isOpen=true;
   fillDetail(active<0?0:active);
   blobs.forEach(b=>b.setAttribute('r',0));
   const ci=coverInset();
@@ -552,14 +553,14 @@ $('#close').onclick=closeDetail;
 $('#dBtn').addEventListener('click',e=>{ if($('#dBtn').classList.contains('off')) e.preventDefault(); });
 
 /* ================= LOOP ================= */
-const play=$('#play'); let last=performance.now();
+const play=$('#play'), prevB=$('#prev'), nextB=$('#next'); let last=performance.now();
 function frame(now){
   requestAnimationFrame(frame);
   const dt=Math.min(.05,(now-last)/1000); last=now;
   const k=reduce?1e3:(dragging?18:5.2);
   s+=(T-s)*(1-Math.exp(-k*dt)); if(Math.abs(T-s)<1e-4) s=T;
-  const loop=4*NV; if(s>loop||s<-loop){ const sh=Math.round(s/NV)*NV; s-=sh; T-=sh; }
-  const ai=((Math.round(s)%N)+N)%N;
+  const ai=clampT(Math.round(s));
+  prevB.classList.toggle('end',Math.round(T)<=0); nextB.classList.toggle('end',Math.round(T)>=N-1);
   if(ai!==active){ const dir=Math.sign(T-s)||1; setActive(ai,dir); }
 
   const scy=VH/2;
@@ -591,7 +592,7 @@ function frame(now){
   cur.style.transform=`translate3d(${cx.toFixed(1)}px,${cy.toFixed(1)}px,0)`;
   cursorState(lastTarget);
 }
-measure(); setActive(((Math.round(s)%N)+N)%N,1);
+measure(); setActive(0,1);
 requestAnimationFrame(frame);
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(measure);
 })();
